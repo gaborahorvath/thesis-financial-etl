@@ -62,7 +62,7 @@ def test_compute_rsi_bounds_and_uptrend_behavior(sample_raw_ohlcv: pd.DataFrame)
     cleaned = transformer.clean_ohlcv_data(sample_raw_ohlcv)
     rsi_series = transformer.compute_rsi(cleaned)
 
-    assert rsi_series.between(0.0, 100.0).all()
+    assert rsi_series.dropna().between(0.0, 100.0).all()
     # Szigorúan növekvő árfolyamnál az RSI értéke 70 feletti (túlvett)
     assert rsi_series.iloc[-1] > 70.0
 

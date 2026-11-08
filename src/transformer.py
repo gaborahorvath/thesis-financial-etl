@@ -133,6 +133,7 @@ class FinancialDataTransformer:
         Vektorizáltan kiszámítja a 14 periódusú Relatív Erősség Indexet (RSI_14)
         Wilder-féle exponenciális simítással a [0, 100] zárt intervallumon (FK3).
         """
+
         def _calc_single_rsi(series: pd.Series) -> pd.Series:
             delta = series.diff()
             gain = delta.clip(lower=0.0)
@@ -146,7 +147,7 @@ class FinancialDataTransformer:
             # Ha avg_loss == 0 és avg_gain > 0 -> RSI = 100; ha nincs elmozdulás -> 50
             rsi = np.where((avg_loss == 0.0) & (avg_gain > 0.0), 100.0, rsi)
             rsi = np.where((avg_loss == 0.0) & (avg_gain == 0.0), 50.0, rsi)
-            return pd.Series(rsi, index=series.index).clip(lower=0.0, upper=100.0).round(4)
+            return pd.Series(rsi, index=series.index).fillna(50.0).clip(lower=0.0, upper=100.0).round(4)
 
         return df.groupby("ticker", observed=True)["close_price"].transform(_calc_single_rsi)
 
@@ -181,8 +182,8 @@ class FinancialDataTransformer:
         A teljes adattisztítási és indikátorszámítási munkafolyamatot összefogó
         vezérlőmetódus, amely a `daily_metrics` táblába tölthető DataFrame-et ad vissza.
         """
-        cleaned_df = self.clean_ohlcv_data(raw_price_df)
-        with_ma_df = self.compute_sma_ema(cleaned_df)
+        cleaned_df = self.clean_ohlcv_data(raw_price_df).reset_index(drop=True)
+        with_ma_df = self.compute_sma_ema(cleaned_df).reset_index(drop=True)
         with_ma_df["rsi_14"] = self.compute_rsi(with_ma_df)
         final_df = self.compute_macd(with_ma_df)
 

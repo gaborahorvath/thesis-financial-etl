@@ -129,7 +129,7 @@ class MarketDataExtractor:
                     group_by="ticker",
                     auto_adjust=False,
                     progress=False,
-                    threads=True
+                    threads=False
                 )
                 if not raw_data.empty:
                     for ticker in self._tickers:

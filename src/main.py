@@ -1,5 +1,6 @@
 import logging
 import os
+os.environ["LC_ALL"] = "C"
 import sys
 import time
 import psutil
@@ -22,7 +23,10 @@ def run_etl_pipeline() -> None:
 
     api_key = os.environ.get("ALPHAVANTAGE_API_KEY", "DEMO")
     # Ha nincs megadva felhős SUPABASE_DB_URI, lokális SQLite adatbázissal tesztelhető PyCharmban
-    db_uri = os.environ.get("SUPABASE_DB_URI", "sqlite:///local_portfolio_test.db")
+    db_uri = os.environ.get(
+        "SUPABASE_DB_URI",
+        "postgresql://postgres.mvorvhcuyhtilsydcjul:EdTrLo13579246@aws-1-eu-west-3.pooler.supabase.com:5432/postgres"
+    )
 
     loader = PostgresDataLoader(connection_uri=db_uri, batch_size=1000)
 
